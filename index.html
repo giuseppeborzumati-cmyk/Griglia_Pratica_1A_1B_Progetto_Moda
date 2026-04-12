@@ -3,143 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier ITP - Azienda di Moda</title>
-    <!-- Tailwind CSS -->
+    <title>Dossier Valutativo - Azienda di Moda</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome per le icone Fashion -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Playfair (Alta Moda) e Inter (Dati Tecnici) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
-    <!-- Libreria PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         /* ========================================================
-           UI WEB (Sfondo e Sidebar)
+           STILI BASE WEB E PANNELLO
            ======================================================== */
         :root {
-            --luxury-dark: #0f172a;
-            --luxury-gold: #b45309;
-            --luxury-light: #f8fafc;
+            --fashion-blue: #1e3a8a;
+            --fashion-gold: #b45309;
+            --fashion-bg: #fdfbf7;
+            --fashion-text: #1c1917;
         }
 
-        body { font-family: 'Inter', sans-serif; background-color: #94a3b8; margin: 0; padding: 20px; display: flex; gap: 20px; color: var(--luxury-dark); }
+        body { font-family: 'Inter', sans-serif; background-color: #94a3b8; margin: 0; padding: 20px; display: flex; gap: 20px; color: var(--fashion-text); }
 
         #control-panel {
             width: 380px; background: white; padding: 25px; border-radius: 12px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-top: 6px solid var(--luxury-dark);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3); border-top: 6px solid var(--fashion-blue);
             position: sticky; top: 20px; height: calc(100vh - 40px); overflow-y: auto;
         }
-        #control-panel label { font-size: 0.75rem; font-weight: 800; color: #334155; text-transform: uppercase; margin-bottom: 4px; display: block; margin-top: 15px;}
-        #control-panel select, #control-panel input { width: 100%; border: 2px solid #cbd5e1; padding: 10px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; background: var(--luxury-light);}
-        #control-panel select:focus, #control-panel input:focus { outline: none; border-color: var(--luxury-dark); background: #fff;}
+        #control-panel label { font-size: 0.75rem; font-weight: 800; color: #334155; text-transform: uppercase; margin-bottom: 6px; display: block; margin-top: 15px;}
+        #control-panel select, #control-panel input { width: 100%; border: 2px solid #cbd5e1; padding: 10px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; background: #f8fafc;}
+        #control-panel select:focus, #control-panel input:focus { outline: none; border-color: var(--fashion-blue); background: #fff;}
 
-        .toggle-switch { display: flex; align-items: center; background: #fef3c7; border: 2px solid #d97706; padding: 12px; border-radius: 6px; margin-top: 20px; cursor: pointer; color: #92400e; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; transition: all 0.2s;}
-        .toggle-switch:hover { background: #fde68a; }
+        .toggle-switch { display: flex; align-items: center; background: #fef3c7; border: 2px solid #f59e0b; padding: 12px; border-radius: 8px; margin-top: 20px; cursor: pointer; color: #92400e; font-weight: 800; text-transform: uppercase; font-size: 0.8rem;}
         .toggle-switch input { margin-right: 10px; width: 18px; height: 18px; accent-color: #b45309;}
 
         /* ========================================================
-           IL FOGLIO A4 (BLINDATURA MARGINI)
+           FOGLI A4 (LAYOUT BLINDATO E PERFETTO)
            ======================================================== */
         #document-preview { flex-grow: 1; display: flex; flex-direction: column; align-items: center; gap: 40px; }
         
         .a4-page {
             width: 210mm; 
             height: 297mm; 
-            background: #ffffff;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
+            background: var(--fashion-bg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
             position: relative;
             box-sizing: border-box; 
-            padding: 0; /* Il padding è gestito dal contenitore interno */
+            padding: 12mm 15mm; /* Margini interni di sicurezza */
             overflow: hidden;
             page-break-after: always;
         }
 
-        .content-box {
-            width: 100%; height: 100%; box-sizing: border-box;
-            padding: 12mm 15mm; /* MARGINI DI SICUREZZA STAMPA */
-            display: flex; flex-direction: column;
+        /* Bordo decorativo interno stile rivista Vogue */
+        .a4-page::after {
+            content: '';
+            position: absolute;
+            top: 6mm; bottom: 6mm; left: 6mm; right: 6mm;
+            border: 1px solid rgba(180, 83, 9, 0.2);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* Bordo decorativo stile Fashion Magazine */
-        .content-box::before {
-            content: ''; position: absolute; top: 6mm; bottom: 6mm; left: 6mm; right: 6mm;
-            border: 1px solid rgba(15, 23, 42, 0.15); pointer-events: none; z-index: 0;
-        }
-        .content-box > * { position: relative; z-index: 1; }
+        .page-content { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
 
-        /* ========================================================
-           TIPOGRAFIA E HEADER
-           ======================================================== */
-        .doc-header { border-bottom: 3px solid var(--luxury-dark); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .school-title { font-family: 'Playfair Display', serif; font-size: 15pt; font-weight: 900; color: var(--luxury-dark); text-transform: uppercase; letter-spacing: 1px;}
-        .school-info { font-size: 7.5pt; color: #475569; font-weight: 700; text-transform: uppercase;}
+        /* INTESTAZIONI PAGINE */
+        .doc-header { border-bottom: 2px solid var(--fashion-blue); padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .school-title { font-family: 'Playfair Display', serif; font-size: 15pt; font-weight: 800; color: var(--fashion-blue); text-transform: uppercase; line-height: 1.1;}
+        .school-info { font-size: 8pt; color: #475569; font-weight: 700;}
 
-        /* BARRA DATI STUDENTE (SUPER DETTAGLIATA SU OGNI PAGINA) */
-        .student-bar-complex {
-            border: 2px solid var(--luxury-dark); border-radius: 6px; margin-bottom: 15px; overflow: hidden; background: white;
-            display: flex; flex-direction: column;
+        /* BARRA DATI STUDENTE SU OGNI PAGINA */
+        .student-bar {
+            background: white; border: 1px solid #cbd5e1; border-left: 4px solid var(--fashion-blue);
+            padding: 8px 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;
         }
-        .sbc-top { display: flex; border-bottom: 1px solid #cbd5e1; }
-        .sbc-item { flex: 1; padding: 6px 10px; border-right: 1px solid #cbd5e1; display: flex; flex-direction: column; justify-content: center;}
-        .sbc-item:last-child { border-right: none; }
-        .sbc-label { font-size: 6.5pt; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 2px;}
-        .sbc-value { font-size: 9pt; font-weight: 800; color: var(--luxury-dark); text-transform: uppercase;}
-        .sbc-value-brand { font-family: 'Playfair Display', serif; font-size: 11pt; color: var(--luxury-gold); font-weight: 900;}
-        
-        .sbc-bottom { display: flex; background: var(--luxury-light); }
-        .sbc-grade-mod { flex: 1; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; border-right: 2px solid var(--luxury-dark); background: #e0f2fe;}
-        .sbc-grade-fin { flex: 1; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; background: var(--luxury-dark); color: white;}
-        .sbc-grade-label { font-size: 8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
-        .sbc-grade-val { font-size: 16pt; font-family: 'Playfair Display', serif; font-weight: 900;}
+        .student-bar div { font-size: 8pt; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .student-bar span { color: var(--fashion-text); font-size: 9.5pt; font-family: 'Playfair Display', serif; font-weight: 700; margin-left: 4px;}
 
-        /* HEADER DELLE GRIGLIE */
-        .grid-header { display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--luxury-dark); margin-bottom: 10px; background: white; border-radius: 6px; padding: 10px 15px;}
-        .gh-title { font-family: 'Playfair Display', serif; font-size: 14pt; font-weight: 900; color: var(--luxury-dark); display: flex; align-items: center; gap: 12px; text-transform: uppercase;}
+        /* TITOLI E BOX (Pagina 1) */
+        .uda-title { font-family: 'Playfair Display', serif; font-size: 22pt; font-weight: 800; color: var(--fashion-text); text-align: center; margin: 20px 0 5px 0; text-transform: uppercase; letter-spacing: 1px;}
+        .uda-subtitle { font-size: 10pt; color: var(--fashion-gold); font-weight: 800; text-transform: uppercase; text-align: center; margin-bottom: 25px; letter-spacing: 2px;}
 
-        /* ========================================================
-           LE SUPER GRIGLIE ANALITICHE (4 FASCE CON DESCRITTORI LUNGHI)
-           ======================================================== */
-        .eval-table { width: 100%; border-collapse: collapse; border: 2px solid var(--luxury-dark); table-layout: fixed;}
-        .eval-table th, .eval-table td { border: 1px solid #cbd5e1; padding: 8px 12px; }
-        
-        .eval-table th { 
-            background-color: #f1f5f9; width: 22%; text-align: left; 
-            font-size: 8.5pt; font-weight: 900; color: var(--luxury-dark); vertical-align: top;
-        }
-        
-        .eval-table td { 
-            vertical-align: top; line-height: 1.5; font-size: 8.5pt; color: #1e293b; text-align: justify; font-weight: 500;
-        }
+        .info-grid { border: 2px solid var(--fashion-blue); border-radius: 6px; margin-bottom: 25px; overflow: hidden; background: white;}
+        .info-row { display: flex; border-bottom: 1px solid #cbd5e1; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { width: 35%; background: var(--fashion-blue); color: white; padding: 10px 15px; font-size: 8.5pt; font-weight: 800; text-transform: uppercase; display: flex; align-items: center;}
+        .info-val { width: 65%; padding: 10px 15px; font-size: 11pt; font-weight: 700; color: var(--fashion-text); display: flex; align-items: center;}
+        .info-val.brand-text { font-family: 'Playfair Display', serif; font-size: 15pt; color: var(--fashion-gold); font-weight: 800; }
+
+        /* HEADER DELLE GRIGLIE (Sopra ogni tabella) */
+        .grid-header { display: flex; justify-content: space-between; align-items: stretch; border: 2px solid var(--fashion-blue); margin-bottom: 10px; background: white; border-radius: 6px; overflow: hidden;}
+        .gh-title { padding: 12px 15px; flex-grow: 1; font-family: 'Playfair Display', serif; font-size: 14pt; font-weight: 800; color: var(--fashion-blue); display: flex; align-items: center; gap: 12px; text-transform: uppercase;}
+        .gh-score-box { width: 140px; background: var(--fashion-blue); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; border-left: 2px solid var(--fashion-blue);}
+        .gh-score-lbl { font-size: 7pt; font-weight: 800; letter-spacing: 2px; opacity: 0.9;}
+        .gh-score-val { font-size: 26pt; font-family: 'Playfair Display', serif; font-weight: 800; line-height: 1; margin-top: 2px;}
+
+        /* TABELLA ANALITICA (SUPER GRIGLIE) */
+        .eval-table { width: 100%; border-collapse: collapse; border: 2px solid #94a3b8; table-layout: fixed; background: white;}
+        .eval-table th { background-color: #f1f5f9; padding: 10px; border: 1px solid #cbd5e1; width: 18%; text-align: center; text-transform: uppercase; font-size: 8.5pt; font-weight: 800; color: #475569;}
+        .eval-table td { padding: 12px 15px; border: 1px solid #cbd5e1; vertical-align: middle; line-height: 1.5; font-size: 8.5pt; color: #334155; text-align: justify; font-weight: 500;}
 
         /* EVIDENZIATORE RIGHE */
         .row-dimmed { opacity: 0.4; }
         .row-active { opacity: 1; background-color: #fff;}
-        .row-active th { background-color: var(--luxury-dark); color: white; border-color: var(--luxury-dark); }
-        .row-active td { border: 3px solid var(--luxury-dark); font-weight: 700; color: #000; }
+        .row-active th { background-color: var(--fashion-blue); color: white; border-color: var(--fashion-blue); }
+        .row-active td { border: 3px solid var(--fashion-blue); font-weight: 600; color: var(--fashion-text); }
 
-        /* Sotto-Titoli nei Descrittori per maggiore leggibilità */
-        .sub-ind { font-weight: 900; text-transform: uppercase; color: var(--luxury-gold); font-size: 7.5pt; display: block; margin-top: 6px; margin-bottom: 2px; border-bottom: 1px dotted #cbd5e1;}
-
-        /* ========================================================
-           IL GRAN FINALE (PAGINA 1)
-           ======================================================== */
-        .uda-box { border: 2px solid var(--luxury-dark); padding: 15px; text-align: center; margin-bottom: 20px; background-color: #fff; border-radius: 8px;}
-        .uda-title { font-family: 'Playfair Display', serif; font-size: 20pt; font-weight: 900; color: var(--luxury-dark); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;}
-        .uda-subjects { font-size: 9pt; color: var(--luxury-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
-
-        .final-box { display: flex; border: 4px solid var(--luxury-dark); margin-top: 20px; border-radius: 8px; overflow: hidden; background: white;}
-        .feb-grade { width: 180px; background: var(--luxury-dark); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;}
-        .feb-grade-num { font-size: 65pt; font-family: 'Playfair Display', serif; font-weight: 900; line-height: 1; margin: 10px 0;}
-        .feb-comment { flex-grow: 1; padding: 25px; text-align: left;}
-        .feb-comment-title { font-family: 'Playfair Display', serif; font-size: 14pt; font-weight: 900; color: var(--luxury-dark); border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 12px; text-transform: uppercase;}
-        .feb-comment-text { font-size: 10pt; line-height: 1.6; text-align: justify; font-weight: 500; color: #334155;}
+        /* IL GRAN FINALE (PAGINA 1 e 6) */
+        .final-eval-box { display: flex; border: 3px solid var(--fashion-blue); margin-top: 20px; border-radius: 8px; overflow: hidden; background: white;}
+        .feb-grade { width: 180px; background: var(--fashion-blue); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;}
+        .feb-grade-num { font-size: 55pt; font-family: 'Playfair Display', serif; font-weight: 800; line-height: 1; margin: 10px 0;}
+        .feb-comment { flex-grow: 1; padding: 20px;}
+        .feb-comment-title { font-family: 'Playfair Display', serif; font-size: 13pt; font-weight: 800; color: var(--fashion-blue); border-bottom: 2px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 12px;}
+        .feb-comment-text { font-size: 9.5pt; line-height: 1.6; text-align: justify; font-weight: 500; color: #334155;}
 
         /* FOOTER */
-        .page-footer { position: absolute; bottom: 10mm; left: 15mm; right: 15mm; border-top: 2px solid var(--luxury-dark); padding-top: 6px; display: flex; justify-content: space-between; font-size: 7.5pt; font-weight: 800; color: var(--luxury-dark); text-transform: uppercase; z-index: 10;}
+        .page-footer { position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px solid #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; font-size: 7.5pt; font-weight: 800; color: var(--fashion-blue); text-transform: uppercase; }
 
         /* ========================================================
-           PRINT CSS (Niente Sminchiamenti, Formato A4 Blindato)
+           PRINT CSS (A4 Perfetto Nativo)
            ======================================================== */
         @media print {
             @page { size: A4 portrait; margin: 0; }
@@ -148,20 +125,14 @@
             #document-preview { display: block; gap: 0; }
             .a4-page { margin: 0; box-shadow: none; border: none; page-break-after: always; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            
-            /* Colori forzati per la stampa PDF */
-            .row-dimmed { opacity: 0.35 !important; }
-            .row-active { opacity: 1 !important; }
-            .row-active th { background-color: var(--luxury-dark) !important; color: white !important; }
-            .gh-score-box, .feb-grade { background-color: var(--luxury-dark) !important; color: white !important;}
         }
 
-        /* MODALITA' GRIGLIA VUOTA */
+        /* CLASSI PER LA MODALITÀ VUOTA (Stampa Master) */
         .empty-mode .out-alunna, .empty-mode .out-brand, .empty-mode .out-classe, .empty-mode .out-team { color: transparent !important; }
-        .empty-mode .out-v-word, .empty-mode .out-v-excel, .empty-mode .out-v-ppt, .empty-mode .out-v-sites, .empty-mode .out-voto-finale { display: none !important; }
+        .empty-mode .gh-score-val, .empty-mode .feb-grade-num, .empty-mode .out-media { color: transparent !important; }
         .empty-mode .row-dimmed { opacity: 1 !important; }
-        .empty-mode .row-active th { background-color: #f1f5f9 !important; color: #334155 !important; border-color: #cbd5e1 !important; }
-        .empty-mode .row-active td { border: 1px solid #cbd5e1 !important; font-weight: 500 !important; color: #1e293b !important; }
+        .empty-mode .row-active th { background-color: #f1f5f9 !important; color: #475569 !important; border-color: #cbd5e1 !important; }
+        .empty-mode .row-active td { border: 1px solid #cbd5e1 !important; font-weight: 500 !important; color: #334155 !important; }
         .empty-mode #generated-comment { color: transparent !important; }
     </style>
 </head>
@@ -169,18 +140,18 @@
 
     <!-- PANNELLO DI CONTROLLO -->
     <div id="control-panel" class="no-print">
-        <h2 class="text-2xl font-black mb-1 text-slate-900 uppercase tracking-widest"><i class="fas fa-gem mr-2 text-amber-600"></i>Dossier I.T.P.</h2>
-        <p class="text-xs text-slate-500 font-bold mb-4 border-b-2 border-slate-900 pb-3">Valutazione Progetto "Azienda di Moda"</p>
+        <h2 class="text-2xl font-bold mb-2 text-blue-900 uppercase tracking-wide"><i class="fas fa-crown mr-2"></i>Dossier I.T.P.</h2>
+        <p class="text-xs text-gray-500 font-semibold mb-4 border-b-2 border-blue-900 pb-4">Progetto "Costruisci la tua Azienda di Moda"</p>
 
         <label class="toggle-switch">
             <input type="checkbox" id="emptyModeToggle" onchange="toggleEmptyMode()">
-            <i class="fas fa-pen-fancy mr-2"></i> Stampa Master Vuoto
+            <i class="fas fa-file-alt mr-2"></i> Stampa Griglie Vuote
         </label>
         
-        <div id="data-inputs" class="space-y-3 mt-5 transition-opacity">
-            <div class="bg-slate-50 p-4 rounded-lg border border-slate-300 shadow-sm">
-                <label><i class="fas fa-building mr-1"></i> Seleziona Brand</label>
-                <select id="inpBrand" onchange="onBrandChange()" class="mb-3 text-slate-900">
+        <div id="data-inputs" class="space-y-2 mt-4 transition-opacity">
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <label><i class="fas fa-building mr-1"></i> 1. Seleziona Brand</label>
+                <select id="inpBrand" onchange="onBrandChange()" class="mb-3 text-blue-900">
                     <optgroup label="Classe 1^A">
                         <option value="reve">Rêve Couture</option>
                         <option value="vousier">Vousier Milano</option>
@@ -193,40 +164,44 @@
                     </optgroup>
                 </select>
 
-                <label><i class="fas fa-user-tie mr-1"></i> Seleziona Alunna</label>
-                <select id="inpAlunna" onchange="updateDoc()" class="text-slate-900"></select>
+                <label><i class="fas fa-user-tie mr-1"></i> 2. Seleziona Alunna</label>
+                <select id="inpAlunna" onchange="updateDoc()" class="text-blue-900"></select>
             </div>
 
-            <div class="border-t-2 border-slate-300 pt-4 mt-4">
-                <h3 class="text-xs font-black mb-3 uppercase text-center bg-slate-900 text-white py-2 rounded">Voti Modulari (1-10)</h3>
+            <div class="border-t-2 border-slate-200 pt-4 mt-4">
+                <h3 class="text-xs font-bold mb-3 uppercase text-center bg-blue-900 text-white py-2 rounded">Inserimento Voti (1-10)</h3>
                 
                 <div class="flex items-center justify-between mb-2">
                     <label class="w-32 !mt-0 text-blue-700"><i class="fas fa-file-word text-lg mr-2"></i> Word</label>
-                    <input type="number" id="inpWord" min="1" max="10" step="0.25" value="8" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
+                    <input type="number" id="inpWord" min="1" max="10" step="0.25" value="8.5" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
                 </div>
                 <div class="flex items-center justify-between mb-2">
                     <label class="w-32 !mt-0 text-green-700"><i class="fas fa-file-excel text-lg mr-2"></i> Excel</label>
-                    <input type="number" id="inpExcel" min="1" max="10" step="0.25" value="7.5" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
+                    <input type="number" id="inpExcel" min="1" max="10" step="0.25" value="8" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
                 </div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="w-32 !mt-0 text-orange-600"><i class="fas fa-file-powerpoint text-lg mr-2"></i> PowerPoint</label>
+                    <label class="w-32 !mt-0 text-orange-600"><i class="fas fa-file-powerpoint text-lg mr-2"></i> PPT</label>
                     <input type="number" id="inpPPT" min="1" max="10" step="0.25" value="9" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
                 </div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="w-32 !mt-0 text-purple-700"><i class="fab fa-google text-lg mr-2"></i> G. Sites</label>
+                    <label class="w-32 !mt-0 text-purple-700"><i class="fab fa-google text-lg mr-2"></i> Sites</label>
                     <input type="number" id="inpSites" min="1" max="10" step="0.25" value="8.5" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
+                </div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="w-32 !mt-0 text-red-700"><i class="fas fa-shield-halved text-lg mr-2"></i> Civica</label>
+                    <input type="number" id="inpCivica" min="1" max="10" step="0.25" value="9" class="w-20 text-center font-bold !p-1 !mb-0" oninput="updateDoc()">
                 </div>
             </div>
         </div>
 
-        <button onclick="stampaPDF()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 px-4 uppercase tracking-widest mt-6 flex items-center justify-center gap-3 rounded shadow-xl transition-all border-2 border-black">
-            <i class="fas fa-print text-xl text-amber-500"></i> Stampa A4 (5 Pagine)
+        <button onclick="window.print()" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-4 px-4 uppercase tracking-widest mt-6 flex items-center justify-center gap-3 rounded shadow-lg transition-all border-2 border-blue-950">
+            <i class="fas fa-print text-xl"></i> Stampa Dossier (A4)
         </button>
-        <p class="text-[10px] text-slate-500 mt-3 text-center font-semibold">Il layout è blindato. In stampa non uscirà dai bordi della pagina A4.</p>
+        <p class="text-[10px] text-slate-500 mt-3 text-center font-medium">Il sistema genererà 6 fogli A4 perfetti (Copertina + 5 Griglie separate). Non uscirà mai dai bordi.</p>
     </div>
 
     <!-- =========================================================================
-         DOCUMENTO A4 (5 PAGINE)
+         DOCUMENTO A4 IN ANTEPRIMA (6 PAGINE)
          ========================================================================= -->
     <div id="document-preview">
 
@@ -239,46 +214,45 @@
                     <div>
                         <div class="school-info">MINISTERO DELL'ISTRUZIONE E DEL MERITO</div>
                         <div class="school-title">I.I.S. "Primo Levi" - Seregno</div>
-                        <div class="school-info mt-1"><i class="fas fa-map-marker-alt mr-1"></i> Via Brentine 68, Seregno (MB)</div>
+                        <div class="school-info mt-1">Via Brentine 68, Seregno (MB)</div>
                     </div>
                     <div class="text-right">
-                        <div class="school-info font-bold uppercase text-blue-900">Valutazione Pratica (I.T.P.)</div>
+                        <div class="school-info font-bold uppercase text-blue-800">Valutazione Pratica (I.T.P.)</div>
                         <div style="font-size: 11pt; font-weight: 800; color: #000;">Indirizzo: Sistema Moda</div>
                     </div>
                 </div>
 
-                <div class="uda-box">
-                    <div class="uda-title"><i class="fas fa-crown mr-2" style="color: #b45309; font-size: 16pt;"></i> Dossier Valutativo Progetto:<br>"Costruisci la tua Azienda di Moda"</div>
-                    <div class="uda-subjects">Audit delle Competenze Digitali, Aziendali e di Conformità Normativa</div>
-                </div>
+                <div class="uda-title"><i class="fas fa-gem mr-2" style="color: #b45309; font-size: 14pt;"></i> Dossier Valutativo Progetto:<br>"Costruisci la tua Azienda di Moda"</div>
+                <div class="uda-subtitle">Certificazione Competenze Digitali, Aziendali e Normative</div>
 
-                <div style="border: 2px solid #0f172a; border-radius: 8px; margin-bottom: 25px; overflow: hidden; background: white;">
-                    <div style="background: #0f172a; color: white; padding: 10px 15px; font-size: 9pt; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-user-check mr-2"></i> Anagrafica Candidata e Contesto Aziendale</div>
-                    <div style="padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div>
-                            <div style="font-size: 7.5pt; font-weight: 800; color: #64748b; text-transform: uppercase;">Alunna Valutata</div>
-                            <div style="font-size: 12pt; font-weight: 800; color: #000;" class="out-alunna uppercase"></div>
-                        </div>
-                        <div>
-                            <div style="font-size: 7.5pt; font-weight: 800; color: #64748b; text-transform: uppercase;">Classe</div>
-                            <div style="font-size: 12pt; font-weight: 800; color: #000;" class="out-classe uppercase"></div>
-                        </div>
-                        <div style="grid-column: span 2; border-top: 1px solid #cbd5e1; padding-top: 15px;">
-                            <div style="font-size: 7.5pt; font-weight: 800; color: #b45309; text-transform: uppercase;">Brand / Azienda Simulata</div>
-                            <div style="font-size: 18pt; font-weight: 800; font-family: 'Playfair Display', serif; color: #000;" class="out-brand uppercase"></div>
-                        </div>
-                        <div style="grid-column: span 2;">
-                            <div style="font-size: 7.5pt; font-weight: 800; color: #64748b; text-transform: uppercase;">Team di Progetto (Componenti)</div>
-                            <div style="font-size: 9.5pt; font-weight: 600; color: #334155; line-height: 1.4;" class="out-team"></div>
-                        </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-user-check mr-2"></i> Candidata Valutata</div>
+                        <div class="info-val out-alunna uppercase"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-chalkboard mr-2"></i> Classe</div>
+                        <div class="info-val out-classe uppercase"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-store mr-2"></i> Azienda / Brand</div>
+                        <div class="info-val brand-text out-brand uppercase"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-users mr-2"></i> Team di Progetto</div>
+                        <div class="info-val out-team" style="font-size: 9pt; font-weight: 600; line-height: 1.4;"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label"><i class="fas fa-calendar-alt mr-2"></i> Data Valutazione</div>
+                        <div class="info-val out-data-short"></div>
                     </div>
                 </div>
 
                 <div class="final-eval-box">
                     <div class="feb-grade">
-                        <div style="font-size: 9pt; text-transform: uppercase; font-weight: 800; letter-spacing: 2px; text-align: center;">Media Finale</div>
+                        <div style="font-size: 9pt; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Media Voto Finale</div>
                         <div class="feb-grade-num out-voto-finale"></div>
-                        <div style="font-size: 8pt; font-weight: 600; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 5px; width: 100%; text-align: center;">Voto Esatto</div>
+                        <div style="font-size: 9pt; font-weight: 600; border-top: 1px solid #fff; padding-top: 4px; margin-top: 5px;">(Pratica I.T.P.)</div>
                     </div>
                     <div class="feb-comment">
                         <div class="feb-comment-title"><i class="fas fa-pen-nib mr-2"></i> Relazione Docimologica di Sintesi</div>
@@ -292,268 +266,219 @@
                     <div style="width: 40%; border-top: 1px solid #000; padding-top: 5px;">Firma Docente Teorico<br><br></div>
                     <div style="width: 40%; border-top: 1px solid #000; padding-top: 5px;">Firma Docente I.T.P.<br><br></div>
                 </div>
+
+                <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span>Pagina 1 di 6</span></div>
             </div>
-            <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span class="out-data"></span><span>Pagina 1 di 5</span></div>
         </div>
 
         <!-- ===================================================
-             PAGINA 2: WORD
+             PAGINA 2: WORD (INTERA PAGINA)
              =================================================== -->
         <div class="a4-page">
             <div class="page-content">
-                <div class="doc-header" style="margin-bottom: 10px;">
-                    <div><div class="school-title" style="font-size: 11pt;">I.I.S. "Primo Levi" - Seregno</div></div>
-                    <div class="text-right"><div class="school-info">Dossier Analitico I.T.P.</div></div>
-                </div>
-
-                <div class="student-bar-complex">
-                    <div class="sbc-top">
-                        <div class="sbc-item"><span class="sbc-label">Alunna</span><span class="sbc-value out-alunna"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Classe</span><span class="sbc-value out-classe"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Azienda (Brand)</span><span class="sbc-value-brand out-brand"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Data</span><span class="sbc-value out-data-short"></span></div>
-                    </div>
-                    <div class="sbc-bottom">
-                        <div class="sbc-grade-mod"><span class="sbc-grade-label" style="color: #0284c7;">Voto Modulo:</span><span class="sbc-grade-val" style="color: #0284c7;">Word <span class="out-v-word" style="background: #0284c7; color: white; padding: 2px 10px; border-radius: 4px; margin-left: 8px;"></span></span></div>
-                        <div class="sbc-grade-fin"><span class="sbc-grade-label">Media Finale:</span><span class="sbc-grade-val out-voto-finale"></span></div>
-                    </div>
+                <div class="student-bar">
+                    <div>Alunna: <span class="out-alunna"></span></div>
+                    <div>Classe: <span class="out-classe"></span></div>
+                    <div>Azienda: <span class="out-brand"></span></div>
+                    <div>Data: <span class="out-data-short"></span></div>
                 </div>
 
                 <div class="grid-header">
-                    <div class="gh-title"><i class="fas fa-file-word text-blue-700 text-2xl"></i> Modulo 1: Business Writing e Impaginazione (Word)</div>
+                    <div class="gh-title"><i class="fas fa-file-word text-blue-700 text-3xl"></i> Modulo 1: Business Writing & Relazioni (Word)</div>
+                    <div class="gh-score-box">
+                        <span class="gh-score-lbl">VOTO MODULO</span>
+                        <span class="gh-score-val out-v-word"></span>
+                    </div>
                 </div>
 
                 <table class="eval-table" id="table-word">
                     <tr class="row-dimmed">
-                        <th>Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 4.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Tipografia, Colori e Forme</span>Elaborato privo di formattazione strutturale. Spaziature, margini e rientri sono gestiti manualmente in modo caotico. Assoluta mancanza di applicazione della palette colori aziendale; il documento risulta anonimo e non in linea con l'estetica del marchio moda.<br>
-                            <span class="sub-ind">Struttura Stili e Indice</span>Totale assenza di organizzazione gerarchica logica. Gli Stili di Word (Titolo 1, Titolo 2, Normale) non sono stati utilizzati o sono stati alterati manualmente, rendendo impossibile la generazione di un Sommario o Indice automatico dei contenuti aziendali.<br>
-                            <span class="sub-ind">Lettera B2B e Contenuti Fashion</span>La Lettera Commerciale B2B manca degli elementi costitutivi di base (mittente/destinatario disallineati). Registro linguistico colloquiale e sgrammaticato. Le descrizioni della collezione moda sono povere di dettagli sensoriali. Nessun riferimento alle policy di sostenibilità.
-                        </td>
+                        <th>Gravem. Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 3.9)</span></th>
+                        <td>L'elaborato documentale presenta gravissime carenze strutturali. La formattazione tipografica è del tutto assente o applicata in modo interamente manuale e disordinato. La Relazione Tecnica aziendale è sprovvista di organizzazione logica: totale mancato utilizzo degli Stili (Titolo 1, Titolo 2) e conseguente impossibilità di generare l'Indice Automatico. La Lettera B2B è carente degli elementi base (mittente, destinatario, oggetto) e impiega un registro linguistico colloquiale inidoneo al settore moda.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 5 - 5.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Tipografia, Colori e Forme</span>Impostazione documentale essenziale. L'allineamento dei testi e l'uso dei colori istituzionali del brand appaiono incerti o applicati in modo frammentario. La scelta dei font non è sempre armonizzata col moodboard o risulta di difficile lettura in fase di stampa.<br>
-                            <span class="sub-ind">Struttura Stili e Indice</span>L'applicazione degli Stili automatici per la titolazione è presente ma presenta discontinuità logiche (es. salti di gerarchia). L'Indice automatico è stato tentato, ma richiede pesanti revisioni a causa di errate attribuzioni dei livelli di testo.<br>
-                            <span class="sub-ind">Lettera B2B e Contenuti Fashion</span>La Lettera B2B rispetta l'impaginazione standard formale, ma il contenuto è generico. L'offerta commerciale per i buyer B2B è esposta in modo minimale. I riferimenti all'economia circolare e all'etica della filiera appaiono come aggiunte forzate.
-                        </td>
+                        <th>Inadeguato / Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 4 - 5.9)</span></th>
+                        <td>L'impostazione documentale risulta essenziale e di livello prettamente scolastico. L'applicazione degli Stili automatici per la titolazione è presente ma limitata o discontinua. La Lettera Commerciale B2B rispetta a grandi linee l'impaginazione standard formale, tuttavia il contenuto risulta generico; la presentazione del Brand e l'offerta commerciale sono esposte in modo minimale, privo di forza persuasiva. I riferimenti all'Agenda 2030 appaiono come aggiunte forzate.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Sufficiente / Discreto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Tipografia, Colori e Forme</span>Documento ordinato, leggibile e rispettoso dei margini di stampa. L'inserimento del logo aziendale, l'impiego di forme grafiche di separazione e la scelta dei colori testuali rispecchiano fedelmente l'identità visiva del marchio moda creato.<br>
-                            <span class="sub-ind">Struttura Stili e Indice</span>Corretta gerarchizzazione di base. Gli stili automatici sono stati applicati con sufficiente rigore per garantire la generazione di un Indice automatico funzionante e di facile consultazione, utile per la lettura del business plan.<br>
-                            <span class="sub-ind">Lettera B2B e Contenuti Fashion</span>La Lettera B2B adotta un registro persuasivo, esponendo la <i>Unique Selling Proposition</i> (USP) del Brand. Il catalogo descrive i capi valorizzandone i tessuti. Si citano in modo appropriato le garanzie etiche e di compliance richieste dal mercato (Sostenibilità/Agenda 2030).
-                        </td>
+                        <th>Intermedio<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
+                        <td>Architettura documentale solida e conforme agli standard d'ufficio contemporanei. Corretta gerarchizzazione dei testi con stili automatici ben configurati e un Indice funzionante. La Lettera Commerciale B2B adotta un registro linguistico persuasivo ed espone con chiarezza la <i>Unique Selling Proposition</i> (USP) del Brand, specificando la qualità dei materiali e le logiche della collezione. La documentazione rispetta i margini e l'uso corretto delle tabulazioni.</td>
                     </tr>
                     <tr class="row-dimmed">
                         <th>Avanzato / Esperto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 8 - 10)</span></th>
-                        <td>
-                            <span class="sub-ind">Tipografia, Colori e Forme</span>Perfezione estetica ed editoriale assoluta. Layout formale equiparabile a un reale report societario del settore luxury. Scelta tipografica raffinata, uso magistrale della palette aziendale, integrazione sublime di elementi grafici, intestazioni e piè di pagina personalizzati.<br>
-                            <span class="sub-ind">Struttura Stili e Indice</span>Padronanza totale e ingegneristica del word processor. Gestione avanzata di stili concatenati, rientri millimetrici perfetti e sezioni di documento. Struttura logica inattaccabile, esente da qualsivoglia sbavatura tecnica (controllo perfetto di vedove/orfane).<br>
-                            <span class="sub-ind">Lettera B2B e Contenuti Fashion</span>Capolavoro di <i>Business Writing</i>. Il lessico istituzionale nella Lettera B2B è calibrato chirurgicamente sul target buyer. Sofisticata articolazione della <i>value proposition</i>, descrizioni sensoriali dei capi sublimi e perfetta fusione tra creatività moda, etica e profitto aziendale.
-                        </td>
+                        <td>Piena, totale e autonoma padronanza del <i>Business Writing</i> e della tipografia digitale avanzata. Il layout formale è impeccabile, equiparabile a un reale report societario. Utilizzo strategico di stili concatenati, tabulazioni millimetriche, intestazioni e piè di pagina aziendali. Il linguaggio istituzionale nella Lettera B2B è altamente persuasivo, calibrato sul target buyer, e presenta una sofisticata articolazione della <i>value proposition</i> e delle policy di filiera etica.</td>
                     </tr>
                 </table>
+                <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span>Pagina 2 di 6</span></div>
             </div>
-            <div class="page-footer"><span>Dossier Valutativo I.T.P. - Word</span><span class="out-data"></span><span>Pagina 2 di 5</span></div>
         </div>
 
         <!-- ===================================================
-             PAGINA 3: EXCEL
+             PAGINA 3: EXCEL (INTERA PAGINA)
              =================================================== -->
         <div class="a4-page">
             <div class="page-content">
-                <div class="doc-header" style="margin-bottom: 10px;">
-                    <div><div class="school-title" style="font-size: 11pt;">I.I.S. "Primo Levi" - Seregno</div></div>
-                    <div class="text-right"><div class="school-info">Dossier Analitico I.T.P.</div></div>
-                </div>
-
-                <div class="student-bar-complex">
-                    <div class="sbc-top">
-                        <div class="sbc-item"><span class="sbc-label">Alunna</span><span class="sbc-value out-alunna"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Classe</span><span class="sbc-value out-classe"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Azienda (Brand)</span><span class="sbc-value-brand out-brand"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Data</span><span class="sbc-value out-data-short"></span></div>
-                    </div>
-                    <div class="sbc-bottom">
-                        <div class="sbc-grade-mod"><span class="sbc-grade-label" style="color: #16a34a;">Voto Modulo:</span><span class="sbc-grade-val" style="color: #16a34a;">Excel <span class="out-v-excel" style="background: #16a34a; color: white; padding: 2px 10px; border-radius: 4px; margin-left: 8px;"></span></span></div>
-                        <div class="sbc-grade-fin"><span class="sbc-grade-label">Media Finale:</span><span class="sbc-grade-val out-voto-finale"></span></div>
-                    </div>
+                <div class="student-bar">
+                    <div>Alunna: <span class="out-alunna"></span></div>
+                    <div>Classe: <span class="out-classe"></span></div>
+                    <div>Azienda: <span class="out-brand"></span></div>
+                    <div>Data: <span class="out-data-short"></span></div>
                 </div>
 
                 <div class="grid-header">
-                    <div class="gh-title"><i class="fas fa-file-excel text-green-700 text-2xl"></i> Modulo 2: Modello Gestionale ERP e Analisi Dati (Excel)</div>
+                    <div class="gh-title"><i class="fas fa-file-excel text-green-700 text-3xl"></i> Modulo 2: Architettura ERP & Dati (Excel)</div>
+                    <div class="gh-score-box">
+                        <span class="gh-score-lbl">VOTO MODULO</span>
+                        <span class="gh-score-val out-v-excel"></span>
+                    </div>
                 </div>
 
                 <table class="eval-table" id="table-excel">
                     <tr class="row-dimmed">
-                        <th>Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 4.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Infrastruttura Fogli e Relazioni</span>L'architettura aziendale richiesta sugli 8 fogli di lavoro (Magazzino_Stock, Promo_codes, Vendite, Costi, Dashboard, ecc.) non è stata rispettata. I dati risultano inseriti in modo caotico, senza alcuna interconnessione logica tra i diversi ambiti aziendali simulati.<br>
-                            <span class="sub-ind">Formule Logiche e Calcoli Base</span>Palese errata comprensione dei costrutti. Le funzioni condizionali obbligatorie (<code>=SE</code>, <code>=CONTA.SE</code>) presentano errori di sintassi critici (#N/D, #RIF!) o sono omesse, forzando un inutile inserimento manuale (hardcoded). Incapacità di calcolare la marginalità di profitto.<br>
-                            <span class="sub-ind">Dashboard e Formattazione</span>Nessuna automazione visiva. La formattazione delle celle è inesistente. Il file risulta completamente inutilizzabile per supportare decisioni aziendali o monitorare il flusso del catalogo di moda.
-                        </td>
+                        <th>Gravem. Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 3.9)</span></th>
+                        <td>Infrastruttura logico-matematica gravemente compromessa. L'architettura gestionale richiesta su 8 fogli di lavoro interconnessi (Magazzino_Stock, Promo_codes, Vendite, Costi_Margini) non è stata rispettata. Palese errata comprensione dei costrutti logici: le funzioni condizionali obbligatorie (<code>=SE</code>, <code>=CONTA.SE</code>) presentano errori di sintassi critici o sono omesse, costringendo all'inserimento manuale. Incapacità di calcolare la marginalità di profitto.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 5 - 5.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Infrastruttura Fogli e Relazioni</span>Infrastruttura multi-foglio basilare. I fogli essenziali sono presenti, ma l'organizzazione delle celle (righe/colonne) non è ottimizzata per la lettura dei dati. I riferimenti incrociati sono fragili.<br>
-                            <span class="sub-ind">Formule Logiche e Calcoli Base</span>Formule standard (somma, sottrazione per margini lordi) applicate. L'automazione tramite la funzione <code>=SE()</code> per determinare la disponibilità di magazzino o la validità dei codici promo (confronto con <code>=OGGI()</code>) risulta approssimativa o applicata meccanicamente senza reale comprensione logica.<br>
-                            <span class="sub-ind">Dashboard e Formattazione</span>Manca la strutturazione chiara di una Dashboard Analitica per i KPI. La formattazione (colori, bordi) risulta scolastica e poco attinente all'estetica rigorosa richiesta da un brand di moda.
-                        </td>
+                        <th>Inadeguato / Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 4 - 5.9)</span></th>
+                        <td>Infrastruttura multi-foglio basilare. Le formule matematiche standard (somma, sottrazione per i margini lordi) sono state applicate, ma l'automazione decisionale del gestionale è limitata. La funzione <code>=SE()</code> per determinare la disponibilità di magazzino o la validità dei codici promo (confronto con <code>=OGGI()</code>) risulta approssimativa, formulata con parametri fissi o applicata in modo meccanico. Manca la strutturazione chiara di una Dashboard Analitica.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Sufficiente / Discreto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Infrastruttura Fogli e Relazioni</span>Architettura relazionale sufficientemente solida. I fogli Inventario, Costi, Promozioni e Fornitori comunicano i dati base senza errori di referenza. Il database fornitori è impostato correttamente.<br>
-                            <span class="sub-ind">Formule Logiche e Calcoli Base</span>Implementazione esatta delle logiche condizionali: le allerte di stock tramite <code>=SE()</code> funzionano correttamente. Il calcolo dell'aliquota di margine percentuale sui capi moda è preciso. Applicazione funzionale e ordinata della Convalida Dati (menu a tendina per taglie/stagioni).<br>
-                            <span class="sub-ind">Dashboard e Formattazione</span>Il cruscotto KPI è operativo e sfrutta efficacemente <code>=CONTA.SE()</code> per misurare metriche aziendali (es. Totale Capi Inverno, Articoli Green). Layout pulito e formattazione numerica corretta (valute, %).
-                        </td>
+                        <th>Intermedio<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
+                        <td>Solida gestione dell'architettura relazionale tra i diversi fogli dell'atelier. Implementazione esatta e consapevole delle logiche condizionali: le allerte di stock di magazzino tramite <code>=SE()</code> funzionano correttamente. Il calcolo dell'aliquota di margine sui capi moda è preciso. Applicazione funzionale e ordinata della Convalida Dati (menu a tendina). Il cruscotto KPI (Dashboard) è operativo e sfrutta la funzione <code>=CONTA.SE()</code> per misurare metriche specifiche.</td>
                     </tr>
                     <tr class="row-dimmed">
                         <th>Avanzato / Esperto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 8 - 10)</span></th>
-                        <td>
-                            <span class="sub-ind">Infrastruttura Fogli e Relazioni</span>Sviluppo magistrale, equiparabile a un reale micro-framework ERP aziendale. Architettura dati scalabile, sicura e dal design visivo superbo, con applicazione rigorosa della palette colori del brand alle intestazioni.<br>
-                            <span class="sub-ind">Formule Logiche e Calcoli Base</span>Perfezione logico-matematica. Risoluzione di scenari complessi attraverso funzioni avanzate. Massima efficienza computazionale nell'analisi incrociata di costi, listini B2B/B2C e marginalità. Convalida dati inattaccabile.<br>
-                            <span class="sub-ind">Dashboard e Formattazione</span>Automazione visiva eccezionale tramite Formattazione Condizionale (es. Set di Icone semaforiche, Eco-Score a stelle). La <i>Dashboard Analitica</i> è un capolavoro esecutivo con grafici interattivi e dinamici, perfetta per un board direzionale.
-                        </td>
+                        <td>Modello algoritmico ineccepibile, che simula in modo eccellente e professionale un reale micro-framework ERP. Ingegnerizzazione logica perfetta, scalabile e assolutamente priva di bug. Padronanza assoluta nell'analisi incrociata di costi e margini percentuali. Automazione visiva dei dati eccezionale tramite Formattazione Condizionale dinamica (es. Set di Icone per Eco-Score). La <i>Dashboard Analitica</i> è impeccabile, permettendo un monitoraggio decisionale in tempo reale.</td>
                     </tr>
                 </table>
+                <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span>Pagina 3 di 6</span></div>
             </div>
-            <div class="page-footer"><span>Dossier Valutativo I.T.P. - Excel</span><span class="out-data"></span><span>Pagina 3 di 5</span></div>
         </div>
 
         <!-- ===================================================
-             PAGINA 4: POWERPOINT E VIRUS
+             PAGINA 4: POWERPOINT
              =================================================== -->
         <div class="a4-page">
             <div class="page-content">
-                <div class="doc-header" style="margin-bottom: 10px;">
-                    <div><div class="school-title" style="font-size: 11pt;">I.I.S. "Primo Levi" - Seregno</div></div>
-                    <div class="text-right"><div class="school-info">Dossier Analitico I.T.P.</div></div>
-                </div>
-
-                <div class="student-bar-complex">
-                    <div class="sbc-top">
-                        <div class="sbc-item"><span class="sbc-label">Alunna</span><span class="sbc-value out-alunna"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Classe</span><span class="sbc-value out-classe"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Azienda (Brand)</span><span class="sbc-value-brand out-brand"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Data</span><span class="sbc-value out-data-short"></span></div>
-                    </div>
-                    <div class="sbc-bottom">
-                        <div class="sbc-grade-mod"><span class="sbc-grade-label" style="color: #ea580c;">Voto Modulo:</span><span class="sbc-grade-val" style="color: #ea580c;">PowerPoint <span class="out-v-ppt" style="background: #ea580c; color: white; padding: 2px 10px; border-radius: 4px; margin-left: 8px;"></span></span></div>
-                        <div class="sbc-grade-fin"><span class="sbc-grade-label">Media Finale:</span><span class="sbc-grade-val out-voto-finale"></span></div>
-                    </div>
+                <div class="student-bar">
+                    <div>Alunna: <span class="out-alunna"></span></div>
+                    <div>Classe: <span class="out-classe"></span></div>
+                    <div>Azienda: <span class="out-brand"></span></div>
+                    <div>Data: <span class="out-data-short"></span></div>
                 </div>
 
                 <div class="grid-header">
-                    <div class="gh-title"><i class="fas fa-file-powerpoint text-orange-600 text-2xl"></i> Modulo 3: Pitch Deck Aziendale & Cybersecurity (PPT)</div>
+                    <div class="gh-title"><i class="fas fa-file-powerpoint text-orange-600 text-3xl"></i> Modulo 3: Pitch Deck Aziendale (PPT)</div>
+                    <div class="gh-score-box">
+                        <span class="gh-score-lbl">VOTO MODULO</span>
+                        <span class="gh-score-val out-v-ppt"></span>
+                    </div>
                 </div>
 
                 <table class="eval-table" id="table-ppt">
                     <tr class="row-dimmed">
-                        <th>Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 4.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Struttura e Regola 6x6</span>Pitch Deck aziendale strutturalmente disorganico. Le diapositive appaiono sovraccariche di testo continuo (palese e grave mancato rispetto della regola della sintesi visiva 6x6) ed evidenziano un'assenza totale di gerarchia delle informazioni testuali.<br>
-                            <span class="sub-ind">Moodboard e Grafica</span>Il Moodboard presentato per la collezione moda è un mero collage disconnesso dall'identità del brand e non giustifica la scelta di palette e tessuti. Immagini inserite risultano sgranate o deformate, senza rispetto del Copyright.<br>
-                            <span class="sub-ind">Ricerca Cybersecurity ed Effetti</span>Ricerca sui malware inesistente o frutto di operazione meccanica di copia-incolla senza rielaborazione. Assenza totale di transizioni e animazioni (o utilizzo caotico che genera confusione visiva).
-                        </td>
+                        <th>Gravem. Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 3.9)</span></th>
+                        <td>Pitch Deck aziendale strutturalmente disorganico. Le diapositive appaiono sovraccariche di testo continuo (mancato rispetto della regola della sintesi visiva 6x6) ed evidenziano un'assenza totale di gerarchia delle informazioni. Il Moodboard presentato per la collezione moda è un mero collage disconnesso dall'identità del brand e non giustifica la scelta di palette e tessuti. Assenza di animazioni funzionali o utilizzo errato che genera confusione visiva.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 5 - 5.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Struttura e Regola 6x6</span>Presentazione impostata in modo sufficiente ma scolastico e prevedibile. Trasmette le informazioni di base dell'azienda (Mission, Buyer Persona, Bozzetti), ma si affida a template predefiniti non modificati, risultando debole nell'impatto narrativo.<br>
-                            <span class="sub-ind">Moodboard e Grafica</span>Il Moodboard è presente ma basilare, mancando di connessione emotiva col prodotto moda. L'utilizzo di strumenti avanzati di progettazione visiva (come SmartArt per l'organigramma aziendale) è ridotto al minimo o impiegato meccanicamente.<br>
-                            <span class="sub-ind">Ricerca Cybersecurity ed Effetti</span>L'indagine sui rischi cyber-informatici è schematica ed elenca le minacce principali (Virus, Trojan) senza contestualizzarle efficacemente nel panorama aziendale. Transizioni banali o non adatte a un contesto business.
-                        </td>
+                        <th>Inadeguato / Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 4 - 5.9)</span></th>
+                        <td>Presentazione impostata in modo sufficiente ma scolastico e prevedibile. Trasmette le informazioni di base dell'azienda (Mission, Buyer Persona, Bozzetti) ma difetta gravemente di impatto narrativo ed estetico, affidandosi a template predefiniti non modificati. Il Moodboard è presente ma basilare. L'utilizzo di strumenti avanzati (come SmartArt per l'organigramma o l'integrazione di contenuti multimediali) è ridotto al minimo. Transizioni banali.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Sufficiente / Discreto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
-                        <td>
-                            <span class="sub-ind">Struttura e Regola 6x6</span>Sintesi grafica di livello professionale. Il Pitch Deck è organizzato per mantenere alta l'attenzione dell'interlocutore, rispettando formalmente il bilanciamento tra testi (bullet point), immagini vettoriali e spazi vuoti, favorendo la lettura.<br>
-                            <span class="sub-ind">Moodboard e Grafica</span>Il Moodboard aziendale è coerente e giustifica pienamente le scelte cromatiche della collezione. Corretto e intelligente l'uso delle SmartArt per definire i ruoli del team di lavoro e le gerarchie aziendali.<br>
-                            <span class="sub-ind">Ricerca Cybersecurity ed Effetti</span>Ricerca organica: espone correttamente le minacce informatiche, evidenziando le vulnerabilità che il database o l'e-commerce potrebbero subire (es. Phishing sui dipendenti). Buon inserimento di transizioni fluide tra le slide.
-                        </td>
+                        <th>Intermedio<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
+                        <td>Sintesi grafica di livello professionale e persuasivo. Il Pitch Deck è organizzato per mantenere alta l'attenzione dell'interlocutore, bilanciando in modo logico e pulito testi (rispetto regola 6x6) e immagini. Il Moodboard aziendale è coerente e giustifica pienamente le scelte cromatiche della collezione. Corretto e intelligente l'uso delle SmartArt per la definizione dei ruoli del team e buon inserimento delle animazioni a supporto dell'oratoria.</td>
                     </tr>
                     <tr class="row-dimmed">
                         <th>Avanzato / Esperto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 8 - 10)</span></th>
-                        <td>
-                            <span class="sub-ind">Struttura e Regola 6x6</span>Eccellenza espositiva ed estetica assoluta. Slide minimaliste orientate al modello relazionale per investitori (Corporate Storytelling). Capolavoro di Presentation Design, trasformando concetti complessi in infografiche istantanee.<br>
-                            <span class="sub-ind">Moodboard e Grafica</span>Design personalizzato in ogni singolo pixel. Il Moodboard è un'esperienza sensoriale che immerge lo spettatore nell'universo valoriale dell'azienda. Gestione impeccabile del Copyright delle immagini.<br>
-                            <span class="sub-ind">Ricerca Cybersecurity ed Effetti</span>Analisi della Cyber-sicurezza critica e trasversale: focus su mitigazione attiva dei rischi. Uso magistrale di transizioni avanzate (Morfosi) e piena integrazione multimediale (audio/video, grafici Excel interattivi collegati in tempo reale).
-                        </td>
+                        <td>Eccellenza espositiva, multimediale ed estetica assoluta. Slide minimaliste orientate al modello relazionale per grandi investitori (Corporate Storytelling). Uso magistrale di transizioni avanzate (es. Morfosi) e animazioni sincronizzate chirurgicamente per supportare l'esposizione. Piena integrazione di contenuti audio/video e grafici interattivi collegati ad Excel. Il Moodboard ha un impatto visivo pari a quello di un'agenzia creativa reale.</td>
                     </tr>
                 </table>
+                <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span>Pagina 4 di 6</span></div>
             </div>
-            <div class="page-footer"><span>Dossier Valutativo I.T.P. - PowerPoint</span><span class="out-data"></span><span>Pagina 4 di 5</span></div>
         </div>
 
         <!-- ===================================================
-             PAGINA 5: GOOGLE SITES E PRIVACY/CIVICA
+             PAGINA 5: GOOGLE SITES
              =================================================== -->
         <div class="a4-page">
             <div class="page-content">
-                <div class="doc-header" style="margin-bottom: 10px;">
-                    <div><div class="school-title" style="font-size: 11pt;">I.I.S. "Primo Levi" - Seregno</div></div>
-                    <div class="text-right"><div class="school-info">Dossier Analitico I.T.P.</div></div>
-                </div>
-
-                <div class="student-bar-complex">
-                    <div class="sbc-top">
-                        <div class="sbc-item"><span class="sbc-label">Alunna</span><span class="sbc-value out-alunna"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Classe</span><span class="sbc-value out-classe"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Azienda (Brand)</span><span class="sbc-value-brand out-brand"></span></div>
-                        <div class="sbc-item"><span class="sbc-label">Data</span><span class="sbc-value out-data-short"></span></div>
-                    </div>
-                    <div class="sbc-bottom">
-                        <div class="sbc-grade-mod"><span class="sbc-grade-label" style="color: #7e22ce;">Voto Modulo:</span><span class="sbc-grade-val" style="color: #7e22ce;">G. Sites <span class="out-v-sites" style="background: #7e22ce; color: white; padding: 2px 10px; border-radius: 4px; margin-left: 8px;"></span></span></div>
-                        <div class="sbc-grade-fin"><span class="sbc-grade-label">Media Finale:</span><span class="sbc-grade-val out-voto-finale"></span></div>
-                    </div>
+                <div class="student-bar">
+                    <div>Alunna: <span class="out-alunna"></span></div>
+                    <div>Classe: <span class="out-classe"></span></div>
+                    <div>Azienda: <span class="out-brand"></span></div>
+                    <div>Data: <span class="out-data-short"></span></div>
                 </div>
 
                 <div class="grid-header">
-                    <div class="gh-title"><i class="fab fa-google text-purple-700 text-2xl"></i> Modulo 4: E-Commerce, UX Design & Privacy Policy (Sites)</div>
+                    <div class="gh-title"><i class="fab fa-google text-purple-700 text-3xl"></i> Modulo 4: E-Commerce & Web (G. Sites)</div>
+                    <div class="gh-score-box">
+                        <span class="gh-score-lbl">VOTO MODULO</span>
+                        <span class="gh-score-val out-v-sites"></span>
+                    </div>
                 </div>
 
                 <table class="eval-table" id="table-sites">
                     <tr class="row-dimmed">
-                        <th>Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 4.9)</span></th>
-                        <td>
-                            <span class="sub-ind">UX / UI e Navigazione</span>Piattaforma web non funzionante, incompleta o interamente vuota. L'architettura dell'informazione è confusionaria, con totale mancanza di struttura logica nella navigazione (menu assente o errato). Violazione evidente dei principi di User Experience (UX).<br>
-                            <span class="sub-ind">Contenuti e Vetrina E-Commerce</span>La vetrina dei prodotti fashion è statica, priva di immagini o descrizioni rilevanti, senza alcuna logica di interazione e-commerce. Manca la standardizzazione della <i>Visual Identity</i> (palette colori e font sconnessi dal brand).<br>
-                            <span class="sub-ind">GDPR e Conformità Normativa</span>Gravissime carenze etico-digitali. Ignora i fondamenti del Regolamento Europeo sul trattamento dei Dati (GDPR). Nessuna tutela della Proprietà Intellettuale o Privacy Policy inserita nel sito. Palese abuso di immagini protette. Policy sociali (Netiquette) inesistenti.
-                        </td>
+                        <th>Gravem. Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 3.9)</span></th>
+                        <td>Piattaforma web non funzionante, incompleta o interamente vuota. L'architettura dell'informazione è confusionaria, con una totale mancanza di struttura logica nella navigazione (menu assente o errato). Violazione evidente dei principi fondamentali della User Experience (UX). La vetrina dei prodotti è statica, priva di logiche di interazione e-commerce. Mancanza assoluta di standardizzazione della <i>Visual Identity</i> (palette colori e font sconnessi dal brand).</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 5 - 5.9)</span></th>
-                        <td>
-                            <span class="sub-ind">UX / UI e Navigazione</span>Vetrina digitale mal strutturata. Presenza delle sezioni essenziali (Home, Catalogo) ma con un layout non ottimizzato. L'esperienza di navigazione è lineare ma piatta. Il design responsivo per mobile non è stato curato attivamente.<br>
-                            <span class="sub-ind">Contenuti e Vetrina E-Commerce</span>La simulazione e-commerce presenta schede prodotto basilari. Descrittori dei capi scarsamente valorizzati sotto il profilo del fashion marketing. Nessuna o scarsa integrazione di elementi multimediali attrattivi.<br>
-                            <span class="sub-ind">GDPR e Conformità Normativa</span>Comprensione solo basilare dei vincoli legali. È presente un generico accenno alla tutela della Privacy sul sito, ma non strutturata come formale accordo per gli utenti (Cookie law ignorata). Consapevolezza elementare delle licenze di pubblicazione (Creative Commons).
-                        </td>
+                        <th>Inadeguato / Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 4 - 5.9)</span></th>
+                        <td>Vetrina digitale statica e mal strutturata. Presenza delle sezioni essenziali (Home, Catalogo) ma con un layout non ottimizzato. L'esperienza di navigazione è lineare ma manca di accorgimenti per favorire l'interazione dell'utente finale. La simulazione della piattaforma e-commerce presenta schede prodotto basilari, con descrittori non sufficientemente valorizzati sotto il profilo del marketing digitale. Il design responsivo per mobile non è stato curato.</td>
                     </tr>
                     <tr class="row-dimmed">
-                        <th>Sufficiente / Discreto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
-                        <td>
-                            <span class="sub-ind">UX / UI e Navigazione</span>Ecosistema digitale completo, responsivo e logicamente strutturato. Implementazione coerente dell'interfaccia utente (UI) in aderenza alle specifiche cromatiche e stilistiche del Moodboard aziendale sviluppato nei moduli precedenti.<br>
-                            <span class="sub-ind">Contenuti e Vetrina E-Commerce</span>La vetrina e-commerce è funzionale, con schede articolo corredate da prezziari chiari, specifiche tecniche sui tessuti e descrizioni orientate alla vendita. Corretta integrazione operativa di moduli di contatto e mappe Google.<br>
-                            <span class="sub-ind">GDPR e Conformità Normativa</span>Ha redatto una Privacy Policy chiara e verosimile per la tutela dei dati degli utenti online (consenso e diritto all'oblio). Gestisce consapevolmente il diritto d'autore. Definite regole efficaci e attive di Netiquette online (Body Positivity e inclusione).
-                        </td>
+                        <th>Intermedio<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
+                        <td>Ecosistema digitale completo, responsivo e logicamente strutturato. Implementazione coerente dell'interfaccia utente (UI) in stretta aderenza alle specifiche cromatiche e stilistiche del Moodboard aziendale. La vetrina e-commerce è pienamente funzionale, con schede articolo corredate da prezziari chiari, specifiche tecniche e descrizioni persuasive orientate alla conversione commerciale. Corretta integrazione di moduli di contatto e mappe interattive.</td>
                     </tr>
                     <tr class="row-dimmed">
                         <th>Avanzato / Esperto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 8 - 10)</span></th>
-                        <td>
-                            <span class="sub-ind">UX / UI e Navigazione</span>Sito web che trascende la simulazione scolastica, posizionandosi ai vertici degli standard di settore per le Digital Fashion Boutique. Flussi di navigazione perfetti su Desktop e Mobile. Interfaccia grafica (UI) mozzafiato, pulita e lussuosa.<br>
-                            <span class="sub-ind">Contenuti e Vetrina E-Commerce</span>Progettazione e-commerce magistrale con UX studiata per favorire la conversione (uso sapiente delle Call-to-Action). Integrazione perfetta e armonica di video background promozionali e micro-interazioni per guidare l'utente all'acquisto.<br>
-                            <span class="sub-ind">GDPR e Conformità Normativa</span>Competenze normo-digitali assimilabili a un DPO (Data Protection Officer). Comprensione analitica dei regolamenti sulla riserva dei dati sensibili (<i>Privacy by design</i>). Gestione inattaccabile del Copyright. Footer istituzionale inossidabile dal punto di vista legale.
-                        </td>
+                        <td>Progettazione web ed e-commerce magistrale. La User Experience (UX) risulta fluida, immersiva e studiata specificamente per ridurre l'attrito nel funnel di navigazione del cliente. Posizionamento strategico di pulsanti e <i>Call-to-Action</i> (CTA) ad alto impatto. Footer istituzionale completo. Dettaglio maniacale nell'allestimento visivo e concettuale del catalogo moda, denotando un'elevatissima e rara sensibilità commerciale e tecnica.</td>
                     </tr>
                 </table>
+                <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span>Pagina 5 di 6</span></div>
             </div>
-            <div class="page-footer"><span>Dossier Valutativo I.T.P. - G. Sites & Civica</span><span class="out-data"></span><span>Pagina 5 di 5</span></div>
+        </div>
+
+        <!-- ===================================================
+             PAGINA 6: EDUCAZIONE CIVICA
+             =================================================== -->
+        <div class="a4-page">
+            <div class="page-content">
+                <div class="student-bar">
+                    <div>Alunna: <span class="out-alunna"></span></div>
+                    <div>Classe: <span class="out-classe"></span></div>
+                    <div>Azienda: <span class="out-brand"></span></div>
+                    <div>Data: <span class="out-data-short"></span></div>
+                </div>
+
+                <div class="grid-header">
+                    <div class="gh-title"><i class="fas fa-shield-halved text-red-700 text-3xl"></i> Modulo 5: Ed. Civica, GDPR & Cybersecurity</div>
+                    <div class="gh-score-box">
+                        <span class="gh-score-lbl">VOTO MODULO</span>
+                        <span class="gh-score-val out-v-civica"></span>
+                    </div>
+                </div>
+
+                <table class="eval-table" id="table-civica">
+                    <tr class="row-dimmed">
+                        <th>Gravem. Inadeguato<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 1 - 3.9)</span></th>
+                        <td>Gravissime carenze nell'ambito etico-giuridico e digitale. Ignora o fraintende completamente le normative sulla riserva dei dati personali (Regolamento Europeo GDPR). Nessuna menzione al Diritto d'Autore, con evidente abuso illecito di immagini e contenuti terzi protetti da Copyright. Assente l'analisi dei rischi informatici (Malware, Phishing). Le policy di sostenibilità sociale e la Netiquette aziendale sono omesse o trattate con disarmante superficialità.</td>
+                    </tr>
+                    <tr class="row-dimmed">
+                        <th>Inadeguato / Base<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 4 - 5.9)</span></th>
+                        <td>Comprensione puramente basilare dei vincoli legali della rete. È presente una menzione generica alla tutela della Privacy sul sito, ma non è strutturata come un formale e valido accordo per gli utenti. Consapevolezza elementare sulle norme del Copyright, pur presentando criticità nell'attribuzione delle fonti (licenze CC). La ricerca sulla Cybersecurity elenca i virus ma non li contestualizza nell'azienda. Netiquette formulata in modo decontestualizzato.</td>
+                    </tr>
+                    <tr class="row-dimmed">
+                        <th>Intermedio<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 6 - 7.9)</span></th>
+                        <td>Solida consapevolezza giuridica digitale. Ha redatto una Privacy Policy chiara e verosimile per la tutela dei dati dei consumatori e il rispetto del GDPR (gestione del consenso informato e diritto all'oblio). Dimostra di saper gestire la Proprietà Intellettuale impiegando esplicitamente licenze aperte (Creative Commons) o marchi proprietari (©). Definisce regole efficaci di Netiquette inclusiva (Body Positivity) e comprende i rischi di Phishing/Ransomware aziendali.</td>
+                    </tr>
+                    <tr class="row-dimmed">
+                        <th>Avanzato / Esperto<br><span style="font-weight:normal; font-size:7pt; text-transform:none;">(Voto 8 - 10)</span></th>
+                        <td>Competenze normo-digitali paragonabili a quelle di un vero <i>Data Protection Officer</i> (DPO). Comprensione analitica e profonda dei regolamenti sulla riserva dei dati sensibili, applicando il principio di "Privacy by Design" nel sito web. Gestione inattaccabile del Copyright aziendale. Analisi dei vettori di attacco informatico superba, con relative e precise misure di mitigazione tecniche per proteggere il database. Netiquette argomentata con eccezionale spirito critico.</td>
+                    </tr>
+                </table>
+                <div class="page-footer"><span>Dossier Valutativo I.T.P.</span><span>Pagina 6 di 6</span></div>
+            </div>
         </div>
 
     </div>
@@ -561,12 +486,30 @@
     <script>
         // DATABASE BRAND (Automazione classi e nomi)
         const brandsDatabase = [
-            { id: "reve", classID: "1^A Sistema Moda", name: "Rêve Couture", teamString: "Giulia Pirozzolo, Matilde Fabrizio, Sara De Cillis, Chiara Lecchini, Matilde Ravasi, Anita Casati, Sofia Barbonetti" },
-            { id: "vousier", classID: "1^A Sistema Moda", name: "Vousier Milano", teamString: "Sofia Lafauci, Claudia Nava, Melissa Giannattasio, Andrea Laudato, Giulia Mecozzi, Noemi Meregalli, Martina Rigamonti" },
-            { id: "palmiera", classID: "1^A Sistema Moda", name: "Palmiera", teamString: "Dua Haider, Sofia Dawoud, Ana Giulia Chelariu, Giulia Arnemi, Noor Bokhari, Francesca Salinitro, Mariam Elsiri" },
-            { id: "midnight", classID: "1^B Sistema Moda", name: "Midnight", teamString: "G. Tagliabue, A. Manzoni, A. Zappino, L. Boseggia, S. Stagno, K. Cioffi, F. Cheema" },
-            { id: "gramaaj", classID: "1^B Sistema Moda", name: "Gramaaj", teamString: "Niasse Mariam, Giorgia Benzi, Alice Gioia, Adhara Bottan, Rihanna Bekshiu, Jeimy Hernandez Perez" },
-            { id: "shinegold", classID: "1^B Sistema Moda", name: "Shinegold", teamString: "Sara Raffaele, Sara Belloni, Cristel Rahmanaj, Chiara Negri, Ginevra Carnelli, Alice Parente, Ilaria Colico" }
+            {
+                id: "reve", classID: "1^A Sistema Moda", name: "Rêve Couture",
+                teamString: "Giulia Pirozzolo, Matilde Fabrizio, Sara De Cillis, Chiara Lecchini, Matilde Ravasi, Anita Casati, Sofia Barbonetti"
+            },
+            {
+                id: "vousier", classID: "1^A Sistema Moda", name: "Vousier Milano",
+                teamString: "Sofia Lafauci, Claudia Nava, Melissa Giannattasio, Andrea Laudato, Giulia Mecozzi, Noemi Meregalli, Martina Rigamonti"
+            },
+            {
+                id: "palmiera", classID: "1^A Sistema Moda", name: "Palmiera",
+                teamString: "Dua Haider, Sofia Dawoud, Ana Giulia Chelariu, Giulia Arnemi, Noor Bokhari, Francesca Salinitro, Mariam Elsiri"
+            },
+            {
+                id: "midnight", classID: "1^B Sistema Moda", name: "Midnight",
+                teamString: "G. Tagliabue, A. Manzoni, A. Zappino, L. Boseggia, S. Stagno, K. Cioffi, F. Cheema"
+            },
+            {
+                id: "gramaaj", classID: "1^B Sistema Moda", name: "Gramaaj",
+                teamString: "Niasse Mariam, Giorgia Benzi, Alice Gioia, Adhara Bottan, Rihanna Bekshiu, Jeimy Hernandez Perez"
+            },
+            {
+                id: "shinegold", classID: "1^B Sistema Moda", name: "Shinegold",
+                teamString: "Sara Raffaele, Sara Belloni, Cristel Rahmanaj, Chiara Negri, Ginevra Carnelli, Alice Parente, Ilaria Colico"
+            }
         ];
 
         let currentBrandObj = null;
@@ -627,29 +570,32 @@
             document.querySelectorAll('.out-brand').forEach(el => el.innerText = brandStr.toUpperCase());
             document.querySelectorAll('.out-team').forEach(el => el.innerText = teamStr);
 
-            // 2. Voti Specifici per le 4 Griglie (Civica unita in Sites e PPT)
+            // 2. Voti Specifici per le 5 Pagine
             const vW = parseFloat(document.getElementById('inpWord').value) || 0;
             const vE = parseFloat(document.getElementById('inpExcel').value) || 0;
             const vP = parseFloat(document.getElementById('inpPPT').value) || 0;
             const vS = parseFloat(document.getElementById('inpSites').value) || 0;
+            const vC = parseFloat(document.getElementById('inpCivica').value) || 0;
             
             document.querySelectorAll('.out-v-word').forEach(el => el.innerText = vW);
             document.querySelectorAll('.out-v-excel').forEach(el => el.innerText = vE);
             document.querySelectorAll('.out-v-ppt').forEach(el => el.innerText = vP);
             document.querySelectorAll('.out-v-sites').forEach(el => el.innerText = vS);
+            document.querySelectorAll('.out-v-civica').forEach(el => el.innerText = vC);
 
-            // 3. Media Esatta Matematica (Voto Finale senza griglia conversione)
-            const media = (vW + vE + vP + vS) / 4;
+            // 3. Media Esatta Matematica
+            const media = (vW + vE + vP + vS + vC) / 5;
             document.querySelectorAll('.out-voto-finale').forEach(el => el.innerText = media.toFixed(2));
 
-            // 4. Evidenziazione Dinamica Tabelle (4 fasce: 1-4.9 | 5-5.9 | 6-7.9 | 8-10)
+            // 4. Evidenziazione Dinamica Tabelle (4 fasce: 1-3.9 | 4-5.9 | 6-7.9 | 8-10)
             highlightTable('table-word', vW);
             highlightTable('table-excel', vE);
             highlightTable('table-ppt', vP);
             highlightTable('table-sites', vS);
+            highlightTable('table-civica', vC);
 
             // 5. Generazione Commento Docimologico di Sintesi
-            generaCommento(alunna, brandStr, media, vW, vE, vP, vS);
+            generaCommento(alunna, brandStr, media, vW, vE, vP, vS, vC);
         }
 
         // Funzione calcolo evidenziazione
@@ -658,8 +604,8 @@
             rows.forEach(r => { r.classList.remove('row-active'); r.classList.add('row-dimmed'); });
             
             let targetRow = 0;
-            if (voto < 5) targetRow = 0;         // Inadeguato 1-4.9
-            else if (voto < 6) targetRow = 1;    // Base 5-5.9
+            if (voto < 4) targetRow = 0;         // Inadeguato 1-3.9
+            else if (voto < 6) targetRow = 1;    // Base 4-5.9
             else if (voto < 8) targetRow = 2;    // Intermedio 6-7.9
             else targetRow = 3;                  // Avanzato 8-10
 
@@ -670,11 +616,11 @@
         }
 
         // MOTORE COMMENTI AUTOMATICI
-        function generaCommento(alunna, brand, media, vW, vE, vP, vS) {
-            let commento = `La presente disamina docimologica e tecnica, redatta dal docente I.T.P., certifica formalmente l'insieme delle competenze pratiche, applicative e normative maturate dalla discente <b>${alunna}</b> nel contesto della complessa simulazione di sviluppo aziendale per il brand <b>${brand}</b>. Il Voto Finale espresso è frutto della media matematica esatta delle valutazioni dei singoli moduli formativi. <br><br>`;
+        function generaCommento(alunna, brand, media, vW, vE, vP, vS, vC) {
+            let commento = `La presente disamina docimologica e tecnica, redatta dal docente I.T.P., certifica formalmente l'insieme delle competenze pratiche, applicative e normative maturate dalla discente <b>${alunna}</b> nel contesto della complessa simulazione di sviluppo aziendale per il brand <b>${brand}</b>. <br><br>`;
 
             if (media >= 8.5) {
-                commento += `L'esito globale dell'Audit pratico attesta una performance di livello <b>Eccellente / Avanzato</b>. L'allieva ha dimostrato una straordinaria e trasversale padronanza operativa nell'ecosistema aziendale, applicando con rigoroso metodo ingegneristico e creativo le <i>best practice</i> informatiche richieste in ambito ERP, Business Writing, Corporate Storytelling e Privacy <i>by design</i>. `;
+                commento += `L'esito globale dell'Audit pratico attesta una performance di livello <b>Eccellente / Avanzato</b>. L'allieva ha dimostrato una straordinaria e trasversale padronanza operativa nell'ecosistema aziendale, applicando con rigoroso metodo ingegneristico e creativo le <i>best practice</i> informatiche richieste in ambito ERP, Business Writing, Corporate Storytelling e Compliance Normativa. `;
             } else if (media >= 6.5) {
                 commento += `Il quadro valutativo evidenzia il pieno conseguimento delle competenze digitali con un profilo <b>Intermedio</b> e di sicura autonomia procedurale. L'architettura documentale, gestionale e legale implementata per il marchio <b>${brand}</b> risulta organica, tecnicamente valida e pienamente conforme agli standard minimi richiesti per la digitalizzazione nel settore moda B2B/B2C. `;
             } else if (media >= 5) {
@@ -687,7 +633,8 @@
             if (vW >= 8.5) puntiForza.push("nella sofisticata e rigorosa formattazione tipografica (Business Writing in Word)");
             if (vE >= 8.5) puntiForza.push("nella robusta ingegnerizzazione logico-matematica e dei KPI su framework Excel");
             if (vP >= 8.5) puntiForza.push("nel Corporate Storytelling visivo e nella sintesi del Pitch Deck in PowerPoint");
-            if (vS >= 8.5) puntiForza.push("nella declinazione funzionale, estetica e UX dell'e-commerce aziendale su G. Sites (inclusa l'applicazione della normativa GDPR)");
+            if (vS >= 8.5) puntiForza.push("nella declinazione funzionale, estetica e UX dell'e-commerce aziendale su G. Sites");
+            if (vC >= 8.5) puntiForza.push("nella ineccepibile e matura applicazione della Compliance normativa in tema di GDPR, Cybersecurity e Diritto d'Autore");
 
             if (puntiForza.length > 0) {
                 commento += `<br><br>In sede di meticolosa analisi verticale dei singoli applicativi, la docenza tecnica rileva e segnala formalmente un'eccellenza operativa degna di nota specifica <b>${puntiForza.join(", e ")}</b>. `;
@@ -721,4 +668,5 @@
         };
     </script>
 </body>
+</html>
 </html>
